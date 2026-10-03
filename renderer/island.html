@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file: data:; style-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="island.css" />
+  </head>
+  <body>
+    <!-- The window is a fixed transparent sheet; only #island is visible and
+         only #island takes the mouse. -->
+    <div id="island" class="island" data-mode="collapsed">
+      <!-- The bar sits in the menu bar: a wing either side of the camera notch. -->
+      <div class="bar">
+        <div class="wing wing-left"><img id="mini" class="sprite mini" alt="" draggable="false" /></div>
+        <div class="notch-gap"></div>
+        <div id="counts" class="wing wing-right"></div>
+      </div>
+      <!-- Below the menu bar: what the pet is saying, then every session + alert. -->
+      <div id="body" class="body">
+        <div class="speech">
+          <div id="portrait" class="portrait" title="What's outstanding?"><img id="full" class="sprite full" alt="" draggable="false" /></div>
+          <p id="line" class="line"></p>
+        </div>
+        <div id="rows" class="rows"></div>
+        <div class="footer">
+          <button id="switch" class="link" type="button"></button>
+          <span class="footer-right">
+            <button id="mute" class="link" type="button"></button>
+            <button id="quit" class="link" type="button">Quit</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <script src="island.js"></script>
+  </body>
+</html>

@@ -2,43 +2,53 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("rocky", {
-  // Subscribe to external pings (CLI / Claude Code hooks). Returns an
-  // unsubscribe function.
-  onAction(callback) {
-    const handler = (_event, payload) => callback(payload);
-    ipcRenderer.on("rocky-action", handler);
-    return () => ipcRenderer.removeListener("rocky-action", handler);
+function subscribe(channel, callback) {
+  const handler = (_event, payload) => callback(payload);
+  ipcRenderer.on(channel, handler);
+  return () => ipcRenderer.removeListener(channel, handler);
+}
+
+contextBridge.exposeInMainWorld("doomy", {
+  // The active character (name, accent, sprites) and the island's geometry.
+  // Sent at load and again whenever either changes.
+  onCharacter(callback) {
+    return subscribe("doomy-character", callback);
+  },
+  // The full list of session + alert pills, re-sent on any change.
+  onPills(callback) {
+    return subscribe("doomy-pills", callback);
+  },
+  // Lines the pet should say: { text, ms, pose }.
+  onSay(callback) {
+    return subscribe("doomy-say", callback);
+  },
+  hoverLine() {
+    return ipcRenderer.invoke("doomy-hover-line");
+  },
+  // The window lets clicks through unless the pointer is over the island.
+  setInteractive(interactive) {
+    ipcRenderer.send("doomy-set-interactive", interactive);
+  },
+  // Raise the folder's VS Code window and, for a session, its Claude tab.
+  focusFolder(cwd, sessionId) {
+    ipcRenderer.send("doomy-focus-folder", cwd, sessionId);
+  },
+  markDone(id) {
+    ipcRenderer.send("doomy-mark-done", id);
+  },
+  toggleMute() {
+    ipcRenderer.send("doomy-toggle-mute");
+  },
+  summary() {
+    ipcRenderer.send("doomy-summary");
+  },
+  dismissSession(id, ts) {
+    ipcRenderer.send("doomy-dismiss-session", id, ts);
+  },
+  switchCharacter() {
+    ipcRenderer.send("doomy-switch-character");
   },
   quit() {
-    ipcRenderer.send("rocky-quit");
-  },
-  // Drag-to-reposition bridge.
-  getWindowPos() {
-    return ipcRenderer.invoke("rocky-get-pos");
-  },
-  moveWindow(x, y) {
-    ipcRenderer.send("rocky-set-pos", x, y);
-  },
-  savePosition() {
-    ipcRenderer.send("rocky-save-pos");
-  },
-  getAssetData(name) {
-    return ipcRenderer.invoke("rocky-asset-data", name);
-  },
-  // What Rocky is wearing, so the ball and hat survive a restart.
-  getPrefs() {
-    return ipcRenderer.invoke("rocky-get-prefs");
-  },
-  savePrefs(prefs) {
-    ipcRenderer.send("rocky-save-prefs", prefs);
-  },
-  // Window growth: reserve space right + up (session stack) and left (auto-mode
-  // nudge), plus jump to a terminal tab.
-  reserve(right, top, left) {
-    ipcRenderer.send("rocky-reserve", { right, top, left });
-  },
-  focusTerminal(tty) {
-    ipcRenderer.send("rocky-focus-terminal", tty);
+    ipcRenderer.send("doomy-quit");
   },
 });

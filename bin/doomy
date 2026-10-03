@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+"use strict";
+
+// Tiny CLI that pokes the floating Doomy pet.
+//   doomy ping    -> "over here" (also: doomy jump)
+//   doomy yay     -> small celebration
+//   doomy dance   -> big celebration (bug solved!)
+//   doomy greet   -> say hello
+//   doomy nag     -> after-hours "go home" nag
+//   doomy character [id] -> switch to a character in characters/, or the next one
+//   doomy deployed [dir] -> record that dir's repo is deployed at its current commit
+//   doomy applied [dir]  -> record that dir's migrations are all applied
+//   doomy alert <id> <text> [cwd] [info|warn] -> raise (or update) an alert pill
+//   doomy unalert <id>                        -> clear it
+
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
+
+const SIGNAL_DIR = path.join(os.homedir(), ".doomy");
+const SIGNAL_FILE = path.join(SIGNAL_DIR, "signal.json");
+const VALID = new Set(["jump", "ping", "yay", "dance", "greet", "nag", "character", "deployed", "applied", "alert", "unalert"]);
+
+const action = (process.argv[2] || "jump").toLowerCase();
+const arg = (process.argv[3] || "").toLowerCase();
+
+if (!VALID.has(action)) {
+  console.error(`doomy: unknown action "${action}".`);
+  console.error(`usage: doomy <${[...VALID].join("|")}>`);
+  process.exit(1);
+}
+
+// Deploy / migration records feed the pet's project checks (see checks.js).
+if (action === "deployed" || action === "applied") {
+  const checks = require("../checks");
+  const mark = action === "deployed" ? checks.markDeployed : checks.markApplied;
+  mark(path.resolve(process.argv[3] || process.cwd())).then((ok) => {
+    if (!ok) console.error("doomy: not a git repository");
+    process.exit(ok ? 0 : 1);
+  });
+  return;
+}
+
+// Alerts live in their own file (see README, "Alerts") — the pet shows one pill
+// per entry for as long as the entry exists.
+if (action === "alert" || action === "unalert") {
+  const ALERTS_FILE = path.join(SIGNAL_DIR, "alerts.json");
+  const [id, text, cwd, level] = process.argv.slice(3);
+  if (!id || (action === "alert" && !text)) {
+    console.error("usage: doomy alert <id> <text> [cwd] [info|warn]  |  doomy unalert <id>");
+    process.exit(1);
+  }
+  let alerts = [];
+  try {
+    const data = JSON.parse(fs.readFileSync(ALERTS_FILE, "utf8"));
+    if (Array.isArray(data.alerts)) alerts = data.alerts;
+  } catch {
+    // no alerts file yet
+  }
+  alerts = alerts.filter((alert) => alert && alert.id !== id);
+  if (action === "alert") {
+    const alert = { id, text, ts: Date.now() };
+    if (cwd) alert.cwd = path.resolve(cwd);
+    if (level) alert.level = level;
+    alerts.push(alert);
+  }
+  fs.mkdirSync(SIGNAL_DIR, { recursive: true });
+  const tmp = `${ALERTS_FILE}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, `${JSON.stringify({ alerts }, null, 2)}\n`);
+  fs.renameSync(tmp, ALERTS_FILE);
+  process.exit(0);
+}
+
+const payload = { action, ts: Date.now() };
+if (arg) payload.arg = arg;
+
+fs.mkdirSync(SIGNAL_DIR, { recursive: true });
+fs.writeFileSync(SIGNAL_FILE, JSON.stringify(payload));

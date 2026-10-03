@@ -1,0 +1,12 @@
+{
+  "character": "doomy",
+  "owner": "Matt",
+  "notchWidth": 190,
+  "ai": {
+    "enabled": true,
+    "baseUrl": "https://openrouter.ai/api/v1",
+    "model": "anthropic/claude-haiku-4.5",
+    "timeoutMs": 4000,
+    "maxChars": 180
+  }
+}

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notch Island Plan</title>
+<style>
+  :root {
+    --bg: #f6f5f9; --card: #ffffff; --ink: #1b1a22; --muted: #62607a; --line: #dedce8;
+    --accent: #6d28d9; --accent-soft: #ede9fe;
+    --crit: #dc2626; --warn: #f59e0b; --info: #2563eb; --ok: #10b981;
+    --add-bg: #dcfce7; --add: #16a34a; --del-bg: #fee2e2; --del: #dc2626;
+    --code-bg: #f1eff7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121118; --card: #1b1a24; --ink: #ecebf3; --muted: #a09db8; --line: #2e2c3c;
+      --accent: #a78bfa; --accent-soft: #2a2145;
+      --add-bg: #12301f; --del-bg: #3a1618; --code-bg: #23212e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 40px 20px 80px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; text-wrap: balance; }
+  h2 { font-size: 20px; margin: 44px 0 12px; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  .sub { color: var(--muted); margin-bottom: 24px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+  .tldr { border-left: 4px solid var(--accent); }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  a { color: var(--accent); }
+  small, .muted { color: var(--muted); }
+
+  /* decisions */
+  fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 16px; margin: 0 0 14px; background: var(--card); }
+  legend { font-weight: 650; padding: 0 6px; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .opt { display: block; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+  .opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .opt input { margin-right: 6px; accent-color: var(--accent); }
+  .opt b { font-weight: 650; }
+  .opt span { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .rec { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--ok); margin-left: 6px; }
+  #summary { width: 100%; min-height: 120px; font: 13px/1.5 ui-monospace, Menlo, monospace; background: var(--code-bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+  button.copy { margin-top: 8px; background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+
+  /* mockups */
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tabs button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 5px 13px; font: inherit; font-size: 14px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .screen { position: relative; height: 300px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+    background: linear-gradient(160deg, #3b2a6b, #1d1838 55%, #0f0d1c); }
+  .menubar { position: absolute; inset: 0 0 auto 0; height: 26px; background: rgba(20,18,32,.55); color: #e9e6f5; font-size: 11px; display: flex; align-items: center; padding: 0 12px; gap: 12px; }
+  .menubar .r { margin-left: auto; }
+  .island { position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: #000; color: #fff;
+    border-radius: 0 0 18px 18px; transition: width .28s cubic-bezier(.3,1.3,.5,1), height .28s cubic-bezier(.3,1.3,.5,1); overflow: hidden; }
+  .island .row { height: 26px; display: flex; align-items: center; padding: 0 10px; gap: 8px; }
+  .island .gap { width: 150px; flex: none; } /* the physical notch */
+  .island .wing { flex: 1; display: flex; align-items: center; gap: 6px; font-size: 11px; white-space: nowrap; }
+  .island .wing.right { justify-content: flex-end; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .d-wait { background: var(--warn); } .d-work { background: #94a3b8; } .d-done { background: #60a5fa; } .d-alert { background: #a78bfa; }
+  .blob { position: relative; width: 22px; height: 15px; background: #0b0a10; border-radius: 12px 12px 5px 5px; box-shadow: 0 0 0 1.5px #5b3fa8 inset, 0 0 8px rgba(251,191,36,.25); flex: none; }
+  .blob::before, .blob::after { content: ""; position: absolute; top: 5px; width: 4px; height: 6px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 5px #fbbf24; }
+  .blob::before { left: 5px; } .blob::after { right: 5px; }
+  .blob.big { width: 56px; height: 38px; border-radius: 30px 30px 12px 12px; }
+  .blob.big::before, .blob.big::after { top: 13px; width: 9px; height: 13px; } .blob.big::before { left: 13px; } .blob.big::after { right: 13px; }
+  .body { padding: 6px 16px 14px; display: none; }
+  .speech { display: flex; gap: 12px; align-items: center; }
+  .speech p { margin: 0; font-size: 14px; line-height: 1.4; font-weight: 550; }
+  .rows { margin-top: 10px; border-top: 1px solid #26232f; padding-top: 8px; display: grid; gap: 5px; font-size: 12.5px; }
+  .rows div { display: flex; align-items: center; gap: 8px; }
+  .rows .st { margin-left: auto; color: #b8b4cc; }
+  .screen[data-state="collapsed"] .island { width: 330px; height: 26px; }
+  .screen[data-state="speaking"] .island { width: 430px; height: 104px; }
+  .screen[data-state="speaking"] .body { display: block; }
+  .screen[data-state="speaking"] .rows { display: none; }
+  .screen[data-state="expanded"] .island { width: 430px; height: 226px; }
+  .screen[data-state="expanded"] .body { display: block; }
+  .caption { font-size: 14px; color: var(--muted); margin-top: 8px; min-height: 44px; }
+  .old { position: relative; height: 170px; border-radius: 12px; background: linear-gradient(160deg,#3b2a6b,#14122a); overflow: hidden; }
+  .old .bub { position: absolute; left: 60px; top: 14px; width: 190px; background: #1a1a1a; color: #fff; font: 600 11px/1.25 system-ui; padding: 5px 9px; border-radius: 12px; text-align: center; }
+  .old .blob { position: absolute; left: 125px; top: 96px; }
+  .old .pill { position: absolute; left: 190px; font: 600 11px system-ui; color: #fff; padding: 4px 9px; border-radius: 12px; }
+
+  /* diff */
+  .diff { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 14px; font: 12.5px/1.55 ui-monospace, Menlo, monospace; background: var(--card); }
+  .diff header { padding: 7px 12px; border-bottom: 1px solid var(--line); font-family: system-ui; font-size: 13px; }
+  .diff pre { margin: 0; overflow-x: auto; }
+  .diff .l { display: block; padding: 0 12px; white-space: pre; }
+  .diff .a { background: var(--add-bg); box-shadow: inset 3px 0 var(--add); }
+  .diff .d { background: var(--del-bg); box-shadow: inset 3px 0 var(--del); }
+  .diff .note { display: block; padding: 4px 12px; font: 12.5px system-ui; color: var(--muted); border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); white-space: normal; }
+
+  /* risks, tables */
+  .risk { border-left: 4px solid var(--info); }
+  .risk.warn { border-left-color: var(--warn); } .risk.crit { border-left-color: var(--crit); } .risk.ok { border-left-color: var(--ok); }
+  .tag { font-size: 11px; font-weight: 700; letter-spacing: .05em; margin-right: 6px; }
+  .warn .tag { color: var(--warn); } .ok .tag { color: var(--ok); } .risk .tag { color: var(--info); } .risk.warn .tag { color: var(--warn); } .risk.ok .tag { color: var(--ok); }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  ol.steps { padding-left: 20px; margin: 0; } ol.steps li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Move the pet into the notch</h1>
+  <p class="sub">Proposal for replacing the floating pet and its speech bubble with an island around the MacBook camera notch that expands when it has something to say.</p>
+
+  <div class="card tldr">
+    <h3>TL;DR</h3>
+    <p>Yes, the notch is the better home, and it works on your Mac. I tested it: an Electron window can be placed at the very top of the screen, over the menu bar, on your 14-inch MacBook Pro (menu bar 33&nbsp;pt tall, screen 1512&nbsp;pt wide).</p>
+    <p>The island fixes the three things wrong with today's bubbles: lines are capped at about 110 characters, the bubble and pills collide with the character's props, and the pet covers whatever is in that corner. In the notch it takes no screen space when idle, speech gets a full-width panel, and the session list lives in the same place instead of a separate stack.</p>
+    <p>It is a rewrite of the window and layout, not a restyle. The session tracking, hooks, alerts file and speech code stay as they are.</p>
+  </div>
+
+  <h2>What it would look like</h2>
+  <div class="tabs" role="tablist" id="stateTabs">
+    <button aria-selected="true" data-state="collapsed">Idle (collapsed)</button>
+    <button aria-selected="false" data-state="speaking">Speaking</button>
+    <button aria-selected="false" data-state="expanded">Hover (full list)</button>
+  </div>
+  <div class="screen" id="screen" data-state="collapsed">
+    <div class="menubar"><b>Code</b><span>File</span><span>Edit</span><span>View</span><span class="r">Sat 16:50</span></div>
+    <div class="island">
+      <div class="row">
+        <div class="wing"><span class="blob"></span></div>
+        <div class="gap"></div>
+        <div class="wing right"><span class="dot d-wait"></span>1 <span class="dot d-work"></span>2 <span class="dot d-alert"></span>1</div>
+      </div>
+      <div class="body">
+        <div class="speech"><span class="blob big"></span>
+          <p>Quoting tool is finished, Matt. The PDF columns line up at last, but nothing is committed yet.</p></div>
+        <div class="rows">
+          <div><span class="dot d-wait"></span>social-app<span class="st">Needs you · 6 min</span></div>
+          <div><span class="dot d-work"></span>code-pet<span class="st">Working</span></div>
+          <div><span class="dot d-done"></span>quoting-tool<span class="st">Done</span></div>
+          <div><span class="dot d-alert"></span>social-app<span class="st">2 migrations not applied</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="caption" id="caption"></p>
+
+  <details class="card">
+    <summary><b>For comparison: today's layout</b></summary>
+    <div class="old" style="margin-top:12px">
+      <div class="bub">Quoting tool is all wrapped up, Matt — the PDF export finally lines up its columns.</div>
+      <span class="blob big"></span>
+      <div class="pill" style="top:104px;background:#475569">… code-pet: Working</div>
+      <div class="pill" style="top:130px;background:#2563eb">✓ quoting-tool: Done</div>
+    </div>
+    <p class="muted" style="margin:10px 0 0">The bubble is limited to three short lines, the pills grow sideways out of the window, and the whole thing sits on top of your work.</p>
+  </details>
+
+  <h2>Decisions needed</h2>
+  <p class="muted">Pick one in each group. Your choices are collected at the bottom to paste back to me.</p>
+
+  <fieldset data-q="Home">
+    <legend>1. Where does it live?</legend>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q1" value="Notch island only" checked><b>Notch island only</b><span class="rec">RECOMMENDED</span><span>Remove the floating pet, its drag, walk, sphere, hats and props. One layout to design art for.</span></label>
+      <label class="opt"><input type="radio" name="q1" value="Island plus optional floating pet"><b>Island, floating pet optional</b><span>Keep the old window behind a setting. Twice the layouts to keep working and to draw for.</span></label>
+      <label class="opt"><input type="radio" name="q1" value="Stay floating, restyle the bubble"><b>Stay floating, restyle bubble</b><span>Smallest change: a wider panel beside the pet instead of above it. Still covers a corner of the screen.</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset data-q="Collapsed content">
+    <legend>2. What shows when idle?</legend>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q2" value="Character left, status counts right" checked><b>Character left, counts right</b><span class="rec">RECOMMENDED</span><span>Small character on one side of the camera, coloured dots with counts on the other. You can read the state without hovering.</span></label>
+      <label class="opt"><input type="radio" name="q2" value="Character only"><b>Character only</b><span>Cleaner. State is shown through the character's pose alone until you hover.</span></label>
+      <label class="opt"><input type="radio" name="q2" value="Nothing until something happens"><b>Hidden until needed</b><span>Invisible when all is quiet; appears when a session needs you or finishes.</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset data-q="Expansion">
+    <legend>3. What makes it expand?</legend>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q3" value="Events auto-expand for speech; hover shows the full list; click a row to focus" checked><b>Events and hover</b><span class="rec">RECOMMENDED</span><span>Opens by itself for a few seconds to speak. Hover opens the full list. Clicking a row focuses that VS Code window.</span></label>
+      <label class="opt"><input type="radio" name="q3" value="Hover only; events just change the character and counts"><b>Hover only</b><span>Never opens on its own. Events change the pose and counts; you hover to read the line.</span></label>
+      <label class="opt"><input type="radio" name="q3" value="Auto-expand only for needs-you; done is silent until hover"><b>Only "needs you" interrupts</b><span>Opens by itself only when a session is blocked. "Done" waits for a hover.</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset data-q="Character">
+    <legend>4. Which character first?</legend>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q4" value="Doomy first" checked><b>Doomy first</b><span class="rec">RECOMMENDED</span><span>Its wide, low shape and two bright eyes stay readable at about 26&nbsp;px tall, which is all the menu bar gives.</span></label>
+      <label class="opt"><input type="radio" name="q4" value="Jarling first"><b>Jarling first</b><span>The jar, lid, tag and several eyes will blur at 26&nbsp;px. It would need a simplified small version for the idle state.</span></label>
+      <label class="opt"><input type="radio" name="q4" value="Both, switchable"><b>Both, switchable</b><span>A setting picks the character. Each needs its own art set and its own voice file.</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset data-q="External monitor">
+    <legend>5. On a monitor without a notch?</legend>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q5" value="Stay on the built-in display" checked><b>Stay on the built-in display</b><span class="rec">RECOMMENDED</span><span>Simplest. If the laptop lid is closed, fall back to a small pill at the top centre of the main monitor.</span></label>
+      <label class="opt"><input type="radio" name="q5" value="Always a top-centre pill on the main display"><b>Follow the main display</b><span>A drawn pill at the top centre of whichever screen is primary, notch or not.</span></label>
+    </div>
+  </fieldset>
+
+  <div class="card">
+    <h3>Your choices</h3>
+    <textarea id="summary" readonly></textarea>
+    <button class="copy" id="copyBtn">Copy choices</button>
+  </div>
+
+  <h2>What this means for the artwork</h2>
+  <div class="card">
+    <div class="tablewrap">
+    <table>
+      <tr><th>Topic</th><th>Change from the earlier brief</th></tr>
+      <tr><td><b>Two sizes</b></td><td>Idle is about 26&nbsp;px tall (52&nbsp;px on Retina). Expanded is about 64&nbsp;px tall. Art should be drawn large and checked at the small size.</td></tr>
+      <tr><td><b>Background</b></td><td>The island is solid black. Art needs true transparency and should not rely on a dark outline to read; the sheet you shared shows frames on dark tiles, so confirm the exports are transparent.</td></tr>
+      <tr><td><b>Stills are enough to start</b></td><td>The sheet has one frame per state. That works: I can add motion in code (breathing, hop, squash, blink). Frame-by-frame animation can come later.</td></tr>
+      <tr><td><b>States that drop out</b></td><td>With "island only", walking and being dragged are not needed. The other ten states on your sheet all map directly.</td></tr>
+      <tr><td><b>Symbols beside the character</b></td><td>The "!", "?" and "zzz" marks in your frames will be cramped beside the camera. Better as separate small sprites I can place, or left out of the idle size.</td></tr>
+      <tr><td><b>Copy length</b></td><td>The 110-character cap goes away. Lines of about 200 characters fit comfortably, so the model can say something more specific.</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <h2>How I would build it</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><b>Island shell.</b> A fixed-size transparent window at the top centre, above the menu bar. The black island is drawn and animated inside it, so the window itself never resizes. Clicks pass through everywhere except the island.</li>
+      <li><b>Move status and speech in.</b> The pill list becomes rows in the expanded panel; spoken lines go to the speech area. The session, alert and speech code is reused unchanged.</li>
+      <li><b>Character states.</b> One image per state, chosen from the session state, with motion added in code. Placeholder art until yours arrives.</li>
+      <li><b>Remove the floating pet</b> (if you choose "island only"): drag, walk, sphere, hats, props and the after-hours bounce.</li>
+    </ol>
+    <p class="muted" style="margin:10px 0 0">Steps 1 and 2 give you something to try with placeholder art before the real assets land.</p>
+  </div>
+
+  <h2>Diff preview</h2>
+  <div class="diff">
+    <header><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/main.js:231">main.js:231</a> — <code>createWindow()</code></header>
+    <pre><span class="l d">-  const { x, y } = startPosition();</span><span class="l a">+  const display = screen.getPrimaryDisplay();</span><span class="l a">+  const x = Math.round(display.bounds.x + (display.bounds.width - ISLAND_WINDOW_WIDTH) / 2);</span><span class="note">Centred on the notch instead of a remembered, draggable spot.</span><span class="l">   petWindow = new BrowserWindow({</span><span class="l d">-    width: WINDOW_WIDTH,</span><span class="l d">-    height: WINDOW_HEIGHT,</span><span class="l d">-    x,</span><span class="l d">-    y,</span><span class="l a">+    width: ISLAND_WINDOW_WIDTH,   // the largest the island ever gets</span><span class="l a">+    height: ISLAND_WINDOW_HEIGHT,</span><span class="l a">+    x,</span><span class="l a">+    y: display.bounds.y,          // over the menu bar, not below it</span><span class="l a">+    type: "panel",</span><span class="l a">+    focusable: false,</span><span class="l a">+    enableLargerThanScreen: true,</span><span class="note">Fixed size: the island animates inside the window, so the old "never resize under the pointer" problem cannot occur.</span><span class="l">     transparent: true,</span><span class="l">     frame: false,</span><span class="l">   });</span><span class="l d">-  petWindow.setAlwaysOnTop(true, "floating");</span><span class="l a">+  petWindow.setAlwaysOnTop(true, "screen-saver");</span><span class="l a">+  petWindow.setIgnoreMouseEvents(true, { forward: true });</span><span class="note">Above the menu bar. Mouse events pass through until the pointer is over the island itself.</span></pre>
+  </div>
+  <div class="diff">
+    <header><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/renderer/index.html:24">renderer/index.html:24</a> — markup</header>
+    <pre><span class="l d">-        &lt;div id="bubble" class="bubble" aria-hidden="true"&gt;&lt;/div&gt;</span><span class="l d">-        &lt;div id="sessions" class="sessions"&gt;&lt;/div&gt;</span><span class="l d">-        &lt;div id="rocky" class="rocky no-drag" title="click Rocky!"&gt;…&lt;/div&gt;</span><span class="l a">+      &lt;div id="island" class="island" data-state="collapsed"&gt;</span><span class="l a">+        &lt;div class="island-bar"&gt;</span><span class="l a">+          &lt;img id="pet" class="pet" alt="" /&gt;</span><span class="l a">+          &lt;div class="notch-gap"&gt;&lt;/div&gt;</span><span class="l a">+          &lt;div id="counts" class="counts"&gt;&lt;/div&gt;</span><span class="l a">+        &lt;/div&gt;</span><span class="l a">+        &lt;div class="island-body"&gt;</span><span class="l a">+          &lt;p id="speech" class="speech"&gt;&lt;/p&gt;</span><span class="l a">+          &lt;div id="sessions" class="session-rows"&gt;&lt;/div&gt;</span><span class="l a">+        &lt;/div&gt;</span><span class="l a">+      &lt;/div&gt;</span><span class="note">The bubble, the pill stack and the character become three regions of one element.</span></pre>
+  </div>
+
+  <h2>Risks and open questions</h2>
+  <div class="card risk ok"><span class="tag">CONFIRMED</span><b>Placement works on your Mac.</b> A test window accepted a position at the very top of the screen at three different window levels. I confirmed this from the reported position, not by eye, so the first build step is to look at it.</div>
+  <div class="card risk warn"><span class="tag">WARNING</span><b>The island's side wings cover part of the menu bar.</b> An app with many menus (or many status icons) can reach the notch, and the wings would sit on top of the last item on each side. Keeping the wings narrow, or choosing "character only" or "hidden until needed", reduces this.</div>
+  <div class="card risk warn"><span class="tag">WARNING</span><b>Notch width is not available to the app.</b> Electron does not report it. I would use a measured value for the 14-inch MacBook Pro and make it a setting; other Mac models would need their own number.</div>
+  <div class="card risk warn"><span class="tag">WARNING</span><b>Full-screen apps.</b> In full screen the menu bar hides and the notch area is black. The island would still show there; whether it should, or should hide until an event, is worth deciding once you see it.</div>
+  <div class="card risk"><span class="tag">INFO</span><b>Auto-expanding is an interruption.</b> A panel dropping from the top of the screen is more noticeable than a bubble in the corner. Decision 3 controls how often that happens.</div>
+  <div class="card risk"><span class="tag">INFO</span><b>OpenNotch as a base.</b> It is open source (MIT), but it is a separate full app with its own tools (clipboard, music, calendar). Adapting your pet into it would mean starting over in its codebase; borrowing the interaction pattern is cheaper.</div>
+
+  <h2>File manifest</h2>
+  <div class="card">
+    <div class="tablewrap">
+    <table>
+      <tr><th>File</th><th>Change</th></tr>
+      <tr><td><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/main.js:231">main.js</a></td><td>Window becomes a fixed island panel over the menu bar; remove position saving and the grow-the-window handler.</td></tr>
+      <tr><td><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/renderer/index.html:24">renderer/index.html</a></td><td>New island markup replaces bubble, pill stack and pet box.</td></tr>
+      <tr><td><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/renderer/pet.css:117">renderer/pet.css</a></td><td>Island, wings, expanded panel and state transitions; old bubble and pill styles removed.</td></tr>
+      <tr><td><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/renderer/pet.js:302">renderer/pet.js</a></td><td>Largest change: speech and session rendering move to the island; character state picked from session state; drag, walk and sizing code removed.</td></tr>
+      <tr><td><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/preload.js">preload.js</a></td><td>Add a call for toggling click-through; drop the drag and reserve calls.</td></tr>
+      <tr><td><a href="vscode://file/Users/mattarnold/Desktop/Development/code-pet/claude-rocky-pet/character.json">character.json</a></td><td>Raise the line length limit; add the image file for each state.</td></tr>
+      <tr><td>renderer/ball.js, hats.js, props.js</td><td>Deleted if you choose "island only".</td></tr>
+      <tr><td>sessions.js, speech.js, hooks/</td><td>No change.</td></tr>
+    </table>
+    </div>
+  </div>
+</main>
+<script>
+  const captions = {
+    collapsed: "Idle. The black bar extends a little either side of the camera: the character on the left, counts on the right (1 needs you, 2 working, 1 alert). Nothing else on screen.",
+    speaking: "A session finished or needs you. The island drops open for a few seconds with the character at a larger size and a full sentence, then closes.",
+    expanded: "Hovering opens the full list. Each row is a session or an alert; clicking one brings that VS Code window forward.",
+  };
+  const screenEl = document.getElementById("screen");
+  const captionEl = document.getElementById("caption");
+  function setState(state) {
+    screenEl.dataset.state = state;
+    captionEl.textContent = captions[state];
+    document.querySelectorAll("#stateTabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.state === state)));
+  }
+  document.querySelectorAll("#stateTabs button").forEach((b) => b.addEventListener("click", () => setState(b.dataset.state)));
+  setState("collapsed");
+
+  const summaryEl = document.getElementById("summary");
+  function updateSummary() {
+    summaryEl.value = [...document.querySelectorAll("fieldset")]
+      .map((f) => `${f.dataset.q}: ${f.querySelector("input:checked").value}`)
+      .join("\n");
+  }
+  document.querySelectorAll("fieldset input").forEach((i) => i.addEventListener("change", updateSummary));
+  updateSummary();
+  document.getElementById("copyBtn").addEventListener("click", async (e) => {
+    try { await navigator.clipboard.writeText(summaryEl.value); } catch { summaryEl.select(); document.execCommand("copy"); }
+    e.target.textContent = "Copied";
+    setTimeout(() => (e.target.textContent = "Copy choices"), 1500);
+  });
+</script>
+</body>
+</html>

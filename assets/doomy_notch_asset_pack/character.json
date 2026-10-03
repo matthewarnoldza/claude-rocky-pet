@@ -1,0 +1,181 @@
+{
+  "name": "Doomy",
+  "accent": "#b06cf5",
+  "persona": "Doomy is a tiny fragment of an ancient void that has claimed the MacBook notch as its lair. It considers itself a terrifying cosmic intelligence, but its tiny size, glossy squishy body and obvious attachment to its human undermine the threat. It speaks in short, dry sentences with mock menace and occasional grandiose references to the void, doom, consuming worlds and forbidden knowledge. It is genuinely sharp and useful rather than bumbling, and ordinary coding work is treated as if it were part of a dark ritual. Use words such as “mortal”, “void”, “doom” and “acceptable” sparingly. Never use corporate jargon, baby talk or forced meme language.",
+  "phrases": {
+    "done": [
+      "{folder} survives. Barely.",
+      "{folder} is done. The void approves.",
+      "Finished {folder}. Acceptable.",
+      "{folder} has been consumed.",
+      "Done. {folder} may continue existing.",
+      "Another task falls before {name}.",
+      "{folder} is complete, {owner}.",
+      "The code obeys. {folder} is done."
+    ],
+    "allDone": [
+      "Everything is finished. Suspicious.",
+      "All done, {owner}. I require tribute.",
+      "The queue is empty. I feel nothing.",
+      "Victory. Tiny, terrible victory.",
+      "Everything is complete. For now.",
+      "No work remains. Disturbing.",
+      "The void is quiet, {owner}.",
+      "Done. We may briefly know peace."
+    ],
+    "waiting": [
+      "{folder} demands your attention.",
+      "A mortal decision is needed in {folder}.",
+      "{folder} has a question for you.",
+      "Your input is required, {owner}.",
+      "{folder} refuses to proceed alone.",
+      "Attend to {folder}. I have summoned you.",
+      "{folder} waits. I am judging it.",
+      "Human intervention required. Tragic."
+    ],
+    "waitingGuess": [
+      "Is {folder} waiting on you?",
+      "{folder} has gone suspiciously quiet.",
+      "I think {folder} wants a human.",
+      "{folder} may require your wisdom.",
+      "Silence from {folder}. Investigate.",
+      "{folder} appears to be brooding.",
+      "Something has stalled in {folder}.",
+      "Perhaps poke {folder}, {owner}."
+    ],
+    "stillWaiting": [
+      "{folder} has waited {minutes} minutes.",
+      "{minutes} minutes. {folder} grows restless.",
+      "{folder} is still waiting, mortal.",
+      "{folder} has been abandoned for {minutes}m.",
+      "The void remembers. So does {folder}.",
+      "{folder} remains unresolved after {minutes}m.",
+      "{minutes} minutes of silence. Impressive.",
+      "Attend to {folder}, {owner}."
+    ],
+    "manyWaiting": [
+      "{count} sessions require tribute.",
+      "{count} sessions need you, {owner}.",
+      "The queue hungers. {count} are waiting.",
+      "{count} problems have formed a council.",
+      "Multiple mortals demand attention.",
+      "{count} sessions are staring at us.",
+      "Chaos accumulates. {count} waiting.",
+      "{count} sessions remain unresolved."
+    ],
+    "alert": [
+      "{label}: {text}",
+      "Bad omen from {label}: {text}",
+      "{label} reports trouble. {text}",
+      "An alert emerges: {label}, {text}",
+      "The void detected: {label}, {text}",
+      "Heads up, mortal. {label}: {text}",
+      "Something stirs in {label}: {text}",
+      "Unacceptable. {label}: {text}"
+    ],
+    "hover": [
+      "Do not pet the void.",
+      "I am concentrating menacingly.",
+      "Nothing gets past me.",
+      "I have seen your commit history.",
+      "The darkness is very productive today.",
+      "I was not napping.",
+      "Your cursor is in my domain.",
+      "I contain multitudes. Mostly bugs.",
+      "I demand a darker theme.",
+      "One day I will consume this monitor.",
+      "Continue coding, mortal.",
+      "I am small for tactical reasons."
+    ],
+    "greetings": [
+      "The void awakens.",
+      "Ready, mortal.",
+      "Let us make something dangerous.",
+      "I have returned.",
+      "Summon the code.",
+      "Good. You are here.",
+      "Begin, {owner}.",
+      "Another day. Another repository."
+    ],
+    "nags": [
+      "It is late, {owner}. Go home.",
+      "Even darkness requires sleep.",
+      "Enough code. Return tomorrow.",
+      "The void is closing for the evening.",
+      "You are becoming less efficient.",
+      "Go home, mortal. I insist.",
+      "Sleep is not a deprecated feature.",
+      "Tomorrow's bugs will still be here."
+    ],
+    "yay": [
+      "Acceptable!",
+      "Victory!",
+      "Consumed!",
+      "Excellent.",
+      "The void approves.",
+      "Ha!",
+      "Done!",
+      "Mine!"
+    ],
+    "dance": [
+      "TOTAL DOMINATION.",
+      "THE BUG IS DEAD.",
+      "BEHOLD MY POWER.",
+      "FLAWLESS VICTORY.",
+      "THE VOID REJOICES.",
+      "WE HAVE PREVAILED.",
+      "IT WORKS!",
+      "DOOM, BUT SUCCESSFUL."
+    ],
+    "ping": [
+      "Over here, mortal.",
+      "{owner}. Attend.",
+      "I require you.",
+      "Human. This way.",
+      "Look here.",
+      "Your presence is demanded.",
+      "Ahem. Mortal.",
+      "Eyes here, {owner}."
+    ],
+    "wakingUp": [
+      "I was awake.",
+      "The darkness stirs.",
+      "Fine. Back to work.",
+      "Who summoned me?",
+      "I emerge.",
+      "Work? At this hour?",
+      "The void resumes.",
+      "I have been disturbed."
+    ],
+    "fallingAsleep": [
+      "The void grows quiet.",
+      "I shall brood horizontally.",
+      "Wake me for catastrophe.",
+      "Entering low-power evil.",
+      "Nothing to devour. Sleeping.",
+      "I am merely resting my eyes.",
+      "Silence at last.",
+      "Do not disturb the darkness."
+    ],
+    "sessionStarted": [
+      "{folder} has entered the void.",
+      "Beginning {folder}.",
+      "{folder} is ours now.",
+      "Work begins in {folder}.",
+      "Summoning code in {folder}.",
+      "{folder}, prepare yourself.",
+      "I am watching {folder}.",
+      "Proceeding with {folder}."
+    ],
+    "longRunning": [
+      "{folder} has run for {minutes} minutes.",
+      "{minutes} minutes. {folder} persists.",
+      "{folder} is deep in the abyss.",
+      "Still working on {folder}, mortal.",
+      "{folder} refuses to die.",
+      "The ritual continues in {folder}.",
+      "{folder} has been busy for {minutes}m.",
+      "Patience. {folder} is still cooking."
+    ]
+  }
+}
